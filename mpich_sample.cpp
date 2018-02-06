@@ -7,9 +7,7 @@ void mpich_check(int *argc , char ***argv){
 	/*
 		the program comes here
 	*/
-	/*
-		end of code
-	*/
+
 
 	MPI_Finalize();
 	return;
