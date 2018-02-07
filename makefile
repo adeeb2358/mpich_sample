@@ -1,4 +1,5 @@
 #variables for compilation
+#sudo apt-get install mpich
 CC                  = mpic++
 FILE_EXTENSION 		= cpp
 SRC_DIR             = ""
@@ -48,7 +49,7 @@ all:compile
 compile:directory main
 
 run1:
-	./$(MAIN_EXE_FILE)
+	@ mpirun -n 4  ./$(MAIN_EXE_FILE)
 
 run:
 	@ ulimit -c unlimited #generate core files in ubuntu
