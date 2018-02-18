@@ -2,6 +2,7 @@
 #define MPICH_SAMPLE_H
 
 void mpich_check(int *argc , char ***argv);
+void send_custom_object(int *argc , char ***argv);
 
 
 
