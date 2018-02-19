@@ -1,5 +1,8 @@
 #variables for compilation
 #sudo apt-get install mpich
+#sudo apt-get install libboost-mpi-dev  
+#-lboost_mpi -lboost_serialization as linker options
+
 CC                  = mpic++
 FILE_EXTENSION 		= cpp
 SRC_DIR             = ""
@@ -20,7 +23,7 @@ MAKE_OBJ_DIR        = if [ ! -d "$(OBJ_DIR)/" ]; then  $(MKDIR_P) $(OBJ_DIR); fi
 MAKE_MAIN_EXE_DIR   = if [ ! -d "$(MAIN_EXE)/" ]; then $(MKDIR_P) $(MAIN_EXE); fi;
 
 #variables for debugging
-CCFLAGS             = -g -DEBUG -pthread -mavx -fopenmp
+CCFLAGS             = -g -DEBUG -pthread -mavx -fopenmp  -lboost_mpi -lboost_serialization
 #-msse3
 CORE_FILE 			= core
 
