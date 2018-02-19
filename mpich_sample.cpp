@@ -1,6 +1,15 @@
 #include "bigHeader.h"
 #include "mpich_sample.h"
 
+struct Person{
+	std::string name;
+	int age;
+
+	template <typename Ar> void serialize(Ar& ar,const unsigned int version){
+		ar &name;
+		ar &age;
+	}	
+};
 
 void send_custom_object(int *argc , char ***argv){
 	
@@ -14,9 +23,11 @@ void send_custom_object(int *argc , char ***argv){
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 
 	if(rank == 0){
+		
 		/*
 		data for passing to all of the process
 		*/
+		
 		nlohmann::json Person;
 		Person["name"]   = "adeeb";
 		Person["age"]    = 24;
@@ -85,3 +96,31 @@ void mpich_check(int *argc , char ***argv){
 	MPI_Finalize();
 	return;
 }
+
+//boost mpi sample
+void boost_serialize_check(int *argc , char ***argv){
+	namespace mpi = boost::mpi;
+
+	mpi::environment env;
+	mpi::communicator world;
+
+	if(world.rank() == 0){
+		
+		Person p;
+		p.name = "Adeeb";
+		p.age  = 10;
+
+		for(size_t i = 1; i < world.size(); i++){
+			world.send(i,0,p);
+		}
+	}
+	else{
+		Person p;
+		world.recv(0,0,p);
+		std::cout << "hello," << p.name << std::endl;
+	}
+}
+
+/*
+	communitcation types in MPU
+*/

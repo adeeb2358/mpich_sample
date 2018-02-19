@@ -24,10 +24,11 @@ MAKE_MAIN_EXE_DIR   = if [ ! -d "$(MAIN_EXE)/" ]; then $(MKDIR_P) $(MAIN_EXE); f
 
 #variables for debugging
 CCFLAGS             = -g -DEBUG -pthread -mavx -fopenmp  -lboost_mpi -lboost_serialization
+#CCFLAGS             = -g -DEBUG -pthread   -lboost_mpi -lboost_serialization
 #-msse3
 CORE_FILE 			= core
 
-ASMFLAGS 			= -S  -mavx -fopenmp
+ASMFLAGS 			= -S  -mavx -fopenmp 
 ASM_DIR 			= asm
 MAKE_ASM_DIR 		= if [ ! -d "$(ASM_DIR)/" ]; then $(MKDIR_P) $(ASM_DIR); fi;
 ASM_FILES_WITH_PATH = $(patsubst %.cpp,$(ASM_DIR)/%.s,$(SRC_FILES))
@@ -66,7 +67,7 @@ directory:
 	@ $(MAKE_ASM_DIR)
 
 
-main:build_objects build_main build_asm
+main:build_objects build_main #build_asm
 	
 build_asm:$(OBJ_FILES_ASM)
 
@@ -79,12 +80,12 @@ build_objects:$(OBJ_FILES)
 build_main:
 	
 	@ echo "building main" $^ $(REDIRECT_COMMAND) $(LOG_FILE)
-	@ $(CC) -o3 $(CCFLAGS) -o $(MAIN_EXE_FILE) $(OBJ_FILES_WITH_PATH)  $(REDIRECT_COMMAND) $(LOG_FILE)
+	@ $(CC)  -o $(MAIN_EXE_FILE) $(OBJ_FILES_WITH_PATH)  $(CCFLAGS) $(REDIRECT_COMMAND) $(LOG_FILE)
 
 $(OBJ_FILES):
 	
 	@ echo "compiling" $*.cpp $(REDIRECT_COMMAND) $(LOG_FILE)
-	@ $(CC) -o3 $(CCFLAGS) -c  $*.$(FILE_EXTENSION) -o $(OBJ_DIR)/$@   $(REDIRECT_COMMAND)  $(LOG_FILE)
+	@ $(CC) $(CCFLAGS) -c  $*.$(FILE_EXTENSION) -o $(OBJ_DIR)/$@   $(REDIRECT_COMMAND)  $(LOG_FILE)
 
 .PHONY:	clean
 	
