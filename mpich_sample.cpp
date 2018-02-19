@@ -122,5 +122,28 @@ void boost_serialize_check(int *argc , char ***argv){
 }
 
 /*
-	communitcation types in MPU
+	communitcation types in MPI
+	
+	point to point communcation
+	Prcoess A sends message to Process B
+
+	Stantard mode
+	Retuns as soon as message is sent
+
+	Synchronouus
+	Returns only when the exchange is complete handshake
+
+	Buffered: returns immediately buffer the mesage
+	
+	Ready:
+	Initiated only when recieving is setup
+	Finished immediately
+
+	MPI_{I<immediate non blocking>}[{R<Readu>,S<Synchronous>,B<Buffered>]Send
+	MPI_{I}Recv
+	========================================================
+
+	Collective communication
+	Process broadcasts message to anyone willing to listen 
+
 */
