@@ -12,4 +12,6 @@
 /*#include <boost/mpi/environment.hpp>
 #include <boost/mpi/communicator.hpp>*/
 
+#include <random>
+
 #endif // BIG_HEADER_H

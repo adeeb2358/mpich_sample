@@ -72,6 +72,7 @@ void mpich_check(int *argc , char ***argv){
 	/*
 		the program comes here
 	*/
+
 	int size = 0;
 	int rank = 0;
 
@@ -139,11 +140,128 @@ void boost_serialize_check(int *argc , char ***argv){
 	Initiated only when recieving is setup
 	Finished immediately
 
-	MPI_{I<immediate non blocking>}[{R<Readu>,S<Synchronous>,B<Buffered>]Send
+	MPI_{I<immediate non blocking>}[{R<Ready>,S<Synchronous>,B<Buffered>]Send
 	MPI_{I}Recv
 	========================================================
-
+	
 	Collective communication
 	Process broadcasts message to anyone willing to listen 
 
 */
+
+void communication_types_mpi(int *argc , char ***argv){
+	
+	int size = 0;
+	int rank = 0;
+	
+	MPI_Init(argc,argv);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+	if(rank == 0){
+		int value = 42;
+		for(size_t i = 1; i < size; i++){
+			std::cout << "Ready to send" << rank << "-->" << i << std::endl;
+			//MPI_Send(&value,1,MPI_INT,i,0,MPI_COMM_WORLD);
+			MPI_Ssend(&value,1,MPI_INT,i,0,MPI_COMM_WORLD);
+			std::cout << "Data send |" << rank << "-->" << i << std::endl;
+		}
+	
+	}else{
+		int value = -1;
+		MPI_Recv(&value,1,MPI_INT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		std::cout << rank << " recieved from 0 the value " << value << std::endl;
+	}
+
+	MPI_Finalize();
+
+	return;
+}
+
+/*
+	collective communication
+	broadcast procudure
+*/
+
+void collective_communication(int *argc , char ***argv){
+	int size,rank;
+
+	MPI_Init(argc,argv);
+
+	MPI_Comm_size(MPI_COMM_WORLD,&size);
+	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+
+	int value = 42;
+	MPI_Bcast(&value,1,MPI_INT,0,MPI_COMM_WORLD);
+
+	std::cout << "Rank" << rank << "recieved from 0 the value" << value << std::endl;
+	MPI_Barrier(MPI_COMM_WORLD);
+	std::cout << "Rank " << rank << " is done working" << std::endl;
+
+	MPI_Finalize();
+
+
+	return;
+}
+
+/*
+	reduce function
+*/
+
+int reduce(int *argc , char ***argv){
+	int size,rank;
+
+	MPI_Init(argc,argv);
+
+	MPI_Comm_size(MPI_COMM_WORLD,&size);
+	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+
+	const int itemsPerProcess = 10;
+	const int count           = size * itemsPerProcess;
+	int *data                 = new int[count];
+
+	if(rank == 0){
+		for(size_t i = 0; i < count ; i++){
+			data[i] = rand() % 10;
+		}
+	}
+
+	int *localData = new int[itemsPerProcess];
+	MPI_Scatter(
+		data,itemsPerProcess,MPI_INT,
+		localData,itemsPerProcess,MPI_INT,0,MPI_COMM_WORLD
+	);
+
+	int localSum = 0;
+	for(size_t i = 0; i < itemsPerProcess; i++){
+		localSum += localData[i];
+	}
+
+	delete[] localData;
+
+	int globalSum = 0;
+	MPI_Reduce(&localSum, &globalSum, 1 ,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
+
+	if(rank == 0){
+		std::cout << "Total Sum = " << globalSum << std::endl;
+		delete[] data;
+	}
+
+	MPI_Finalize();
+
+	return 0;
+}
+
+/*
+	collective communication
+	reduce function
+
+*/
+
+void check_reduce(int *argc , char ***argv){
+	std::random_device rd{};
+	std::srand(rd());
+	int reduce_result = reduce(argc,argv);
+	return ;
+}
+
